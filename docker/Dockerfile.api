@@ -1,0 +1,35 @@
+FROM node:20-slim AS builder
+WORKDIR /app
+COPY package.json package-lock.json turbo.json tsconfig.base.json ./
+COPY packages/core/package.json packages/core/
+COPY packages/llm/package.json packages/llm/
+COPY packages/agents/strategist/package.json packages/agents/strategist/
+COPY packages/agents/generator/package.json packages/agents/generator/
+COPY packages/agents/executor/package.json packages/agents/executor/
+COPY packages/agents/analyzer/package.json packages/agents/analyzer/
+COPY packages/api-server/package.json packages/api-server/
+RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts
+COPY packages/core/ packages/core/
+COPY packages/llm/ packages/llm/
+COPY packages/agents/ packages/agents/
+COPY packages/api-server/ packages/api-server/
+RUN npx turbo run build --filter=@test-automation-mcp/api-server
+
+FROM node:20-slim
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/core/dist ./packages/core/dist
+COPY --from=builder /app/packages/core/package.json ./packages/core/
+COPY --from=builder /app/packages/llm/dist ./packages/llm/dist
+COPY --from=builder /app/packages/llm/package.json ./packages/llm/
+COPY --from=builder /app/packages/agents ./packages/agents
+COPY --from=builder /app/packages/api-server/dist ./packages/api-server/dist
+COPY --from=builder /app/packages/api-server/package.json ./packages/api-server/
+COPY --from=builder /app/package.json ./
+RUN mkdir -p /app/data
+EXPOSE 3100
+ENV NODE_ENV=production
+ENV PORT=3100
+ENV HOST=0.0.0.0
+ENV DB_PATH=/app/data/tamcp.db
+CMD ["node", "packages/api-server/dist/index.js"]

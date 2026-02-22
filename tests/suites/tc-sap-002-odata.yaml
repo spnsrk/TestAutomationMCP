@@ -1,0 +1,65 @@
+test:
+  id: "TC-SAP-002"
+  name: "SAP OData Service Test - BusinessPartner"
+  description: "Query BusinessPartner OData service, create a new entity, verify, update, delete"
+  type: api
+  priority: high
+  tags: [sap, odata, api]
+  timeout: 60000
+  retries: 1
+
+  variables:
+    partnerId: "TEST${timestamp}"
+    partnerName: "Test Partner ${timestamp}"
+    partnerNameUpdated: "Updated Partner ${timestamp}"
+
+  steps:
+    - name: "Query BusinessPartner OData service"
+      action: sap/odata.query
+      url: "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner"
+      params:
+        $top: 10
+      save_as: initialPartners
+
+    - name: "Create new BusinessPartner entity"
+      action: sap/odata.create
+      url: "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner"
+      data:
+        BusinessPartner: "${partnerId}"
+        BusinessPartnerName: "${partnerName}"
+      save_as: createdPartner
+
+    - name: "Verify created entity"
+      action: sap/odata.query
+      url: "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner('${partnerId}')"
+      save_as: fetchedPartner
+
+    - name: "Assert created partner matches"
+      assert:
+        - field: fetchedPartner.BusinessPartnerName
+          expected: "${partnerName}"
+
+    - name: "Update BusinessPartner"
+      action: sap/odata.update
+      url: "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner('${partnerId}')"
+      data:
+        BusinessPartnerName: "${partnerNameUpdated}"
+
+    - name: "Verify update"
+      action: sap/odata.query
+      url: "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner('${partnerId}')"
+      save_as: updatedPartner
+
+    - name: "Assert updated name"
+      assert:
+        - field: updatedPartner.BusinessPartnerName
+          expected: "${partnerNameUpdated}"
+
+    - name: "Delete BusinessPartner"
+      action: sap/odata.delete
+      url: "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner('${partnerId}')"
+
+    - name: "Verify deletion - expect 404"
+      action: sap/odata.query
+      url: "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner('${partnerId}')"
+      continueOnFailure: true

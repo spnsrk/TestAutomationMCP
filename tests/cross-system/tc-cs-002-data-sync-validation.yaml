@@ -1,0 +1,48 @@
+test:
+  id: "TC-CS-002"
+  name: "Cross-System Data Sync Validation"
+  description: "Query customer records from Salesforce and SAP, compare key fields (name, address, phone) using data/compare.datasets"
+  type: data-validation
+  priority: high
+  tags: [cross-system, data-validation]
+  timeout: 120000
+  retries: 1
+
+  variables:
+    batchSize: 100
+
+  steps:
+    - name: "Query customer records from Salesforce"
+      action: sf/data.soqlQuery
+      query: "SELECT Id, Name, BillingStreet, BillingCity, BillingPostalCode, Phone FROM Account WHERE Type = 'Customer' LIMIT ${batchSize}"
+      save_as: sfCustomers
+
+    - name: "Query corresponding records from SAP"
+      action: sap/odata.query
+      url: "/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner"
+      params:
+        $filter: "BusinessPartnerCategory eq '1'"
+        $top: ${batchSize}
+      save_as: sapCustomers
+
+    - name: "Compare key fields between SF and SAP datasets"
+      action: data/compare.datasets
+      params:
+        source: "${sfCustomers.records}"
+        target: "${sapCustomers.d.results}"
+        keyField: "Id"
+        compareFields:
+          - source: "Name"
+            target: "BusinessPartnerName"
+          - source: "BillingStreet"
+            target: "StreetName"
+          - source: "Phone"
+            target: "PhoneNumber"
+      save_as: comparisonResult
+
+    - name: "Assert no mismatches in sync"
+      assert:
+        - field: comparisonResult.mismatchCount
+          expected: 0
+        - field: comparisonResult.comparedCount
+          expected: ">0"

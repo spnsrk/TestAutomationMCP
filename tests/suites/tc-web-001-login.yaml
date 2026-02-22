@@ -1,0 +1,45 @@
+test:
+  id: "TC-WEB-001"
+  name: "User Login - Valid Credentials"
+  description: "Verify that a user can log in with valid credentials"
+  type: e2e
+  priority: critical
+  tags: [web, login, smoke]
+  timeout: 60000
+
+  variables:
+    username: "testuser@example.com"
+    password: "TestPass123!"
+
+  steps:
+    - name: "Navigate to login page"
+      action: web/navigate
+      url: "${baseUrl}/login"
+
+    - name: "Fill email"
+      action: web/fill
+      selector: "[data-testid='email-input']"
+      value: "${username}"
+
+    - name: "Fill password"
+      action: web/fill
+      selector: "[data-testid='password-input']"
+      value: "${password}"
+
+    - name: "Click login button"
+      action: web/click
+      selector: "[data-testid='login-button']"
+
+    - name: "Wait for dashboard"
+      action: web/waitForURL
+      url: "**/dashboard"
+      timeout: 10000
+
+    - name: "Verify dashboard loaded"
+      action: web/assertVisible
+      selector: "[data-testid='dashboard-container']"
+
+    - name: "Verify welcome message"
+      action: web/assertText
+      selector: "[data-testid='welcome-message']"
+      text: "Welcome"

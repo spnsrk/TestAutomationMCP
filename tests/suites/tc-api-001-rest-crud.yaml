@@ -1,0 +1,92 @@
+test:
+  id: "TC-API-001"
+  name: "REST API CRUD Test"
+  description: "GET all items, POST a new item, GET by ID, PUT update, DELETE, verify deletion"
+  type: api
+  priority: high
+  tags: [api, rest, crud]
+  timeout: 60000
+  retries: 1
+
+  variables:
+    itemName: "Test Item ${timestamp}"
+    itemDescription: "Created by REST CRUD test"
+    updatedName: "Updated Item ${timestamp}"
+
+  steps:
+    - name: "GET all items"
+      action: api/rest.request
+      params:
+        method: GET
+        url: "${apiBaseUrl}/items"
+      save_as: initialItems
+
+    - name: "POST create new item"
+      action: api/rest.request
+      params:
+        method: POST
+        url: "${apiBaseUrl}/items"
+        body:
+          name: "${itemName}"
+          description: "${itemDescription}"
+      save_as: createResponse
+
+    - name: "Assert create succeeded"
+      assert:
+        - field: createResponse.status
+          expected: 201
+        - field: createResponse.body.id
+          expected: "!=empty"
+
+    - name: "GET item by ID"
+      action: api/rest.request
+      params:
+        method: GET
+        url: "${apiBaseUrl}/items/${createResponse.body.id}"
+      save_as: getResponse
+
+    - name: "Assert GET returns created item"
+      assert:
+        - field: getResponse.body.name
+          expected: "${itemName}"
+        - field: getResponse.body.description
+          expected: "${itemDescription}"
+
+    - name: "PUT update item"
+      action: api/rest.request
+      params:
+        method: PUT
+        url: "${apiBaseUrl}/items/${createResponse.body.id}"
+        body:
+          name: "${updatedName}"
+          description: "${itemDescription}"
+
+    - name: "GET to verify update"
+      action: api/rest.request
+      params:
+        method: GET
+        url: "${apiBaseUrl}/items/${createResponse.body.id}"
+      save_as: updatedItem
+
+    - name: "Assert update applied"
+      assert:
+        - field: updatedItem.body.name
+          expected: "${updatedName}"
+
+    - name: "DELETE item"
+      action: api/rest.request
+      params:
+        method: DELETE
+        url: "${apiBaseUrl}/items/${createResponse.body.id}"
+
+    - name: "GET to verify deletion - expect 404"
+      action: api/rest.request
+      params:
+        method: GET
+        url: "${apiBaseUrl}/items/${createResponse.body.id}"
+      save_as: deleteVerify
+
+    - name: "Assert item deleted"
+      assert:
+        - field: deleteVerify.status
+          expected: 404

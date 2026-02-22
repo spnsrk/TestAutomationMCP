@@ -1,0 +1,26 @@
+test:
+  id: "TC-SF-002"
+  name: "Run Salesforce Apex Tests"
+  description: "Run specific Apex test classes and verify all tests pass"
+  type: integration
+  priority: high
+  tags: [salesforce, apex, unit-test]
+  timeout: 180000
+  retries: 0
+
+  steps:
+    - name: "Run Apex test classes"
+      action: sf/apex.runTests
+      params:
+        testClasses:
+          - "AccountTriggerTest"
+          - "OpportunityServiceTest"
+          - "OrderValidationTest"
+      save_as: apexTestResults
+
+    - name: "Verify all tests passed"
+      assert:
+        - field: apexTestResults.summary.failures
+          expected: 0
+        - field: apexTestResults.summary.testsRan
+          expected: ">0"

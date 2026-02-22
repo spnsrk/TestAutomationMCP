@@ -1,0 +1,17 @@
+suite:
+  id: "SUITE-REGRESSION-FULL"
+  name: "Full Regression Test Suite"
+  description: "Complete regression suite referencing all test definitions"
+  tags: [regression, full]
+  parallel: true
+  maxWorkers: 4
+  tests:
+    - "TC-WEB-001"
+    - "TC-WEB-002"
+    - "TC-SF-001"
+    - "TC-SF-002"
+    - "TC-SAP-001"
+    - "TC-SAP-002"
+    - "TC-CS-001"
+    - "TC-CS-002"
+    - "TC-API-001"

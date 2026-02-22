@@ -1,0 +1,45 @@
+services:
+  api-server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "3100:3100"
+    volumes:
+      - api-data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3100
+      - HOST=0.0.0.0
+      - DB_PATH=/app/data/tamcp.db
+      - LLM_PROVIDER=${LLM_PROVIDER:-ollama}
+      - LLM_MODEL=${LLM_MODEL:-llama3}
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3100
+    depends_on:
+      - api-server
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    profiles:
+      - ai
+    restart: unless-stopped
+
+volumes:
+  api-data:
+  ollama-data:

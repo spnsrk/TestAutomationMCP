@@ -1,0 +1,77 @@
+test:
+  id: "TC-WEB-002"
+  name: "Web App CRUD - Create, Read, Update, Delete"
+  description: "Navigate to a page, create a record via form, verify it appears in a list, edit it, delete it"
+  type: e2e
+  priority: high
+  tags: [web, crud, e2e]
+  timeout: 60000
+  retries: 1
+
+  variables:
+    recordName: "Test Record ${timestamp}"
+    recordDescription: "Created by automated CRUD test"
+    updatedName: "Updated Record ${timestamp}"
+
+  steps:
+    - name: "Navigate to records list page"
+      action: web/navigate
+      url: "${baseUrl}/records"
+
+    - name: "Click create new record button"
+      action: web/click
+      selector: "[data-testid='create-record-button']"
+
+    - name: "Fill record name in form"
+      action: web/fill
+      selector: "[data-testid='record-name-input']"
+      value: "${recordName}"
+
+    - name: "Fill record description"
+      action: web/fill
+      selector: "[data-testid='record-description-input']"
+      value: "${recordDescription}"
+
+    - name: "Submit create form"
+      action: web/click
+      selector: "[data-testid='submit-create-button']"
+
+    - name: "Wait for list to refresh"
+      action: web/waitForSelector
+      selector: "[data-testid='record-list']"
+      timeout: 5000
+
+    - name: "Verify new record appears in list"
+      action: web/assertText
+      selector: "[data-testid='record-list']"
+      value: "${recordName}"
+
+    - name: "Click edit on the first record in list"
+      action: web/click
+      selector: "[data-testid='edit-record-btn']"
+
+    - name: "Update record name"
+      action: web/fill
+      selector: "[data-testid='record-name-input']"
+      value: "${updatedName}"
+
+    - name: "Save edit"
+      action: web/click
+      selector: "[data-testid='save-edit-button']"
+
+    - name: "Verify updated record in list"
+      action: web/assertText
+      selector: "[data-testid='record-list']"
+      value: "${updatedName}"
+
+    - name: "Click delete on the record"
+      action: web/click
+      selector: "[data-testid='delete-record-btn']"
+
+    - name: "Confirm deletion"
+      action: web/click
+      selector: "[data-testid='confirm-delete-button']"
+
+    - name: "Verify record removed from list"
+      action: web/assertNotVisible
+      selector: "[data-testid='record-row']"

@@ -1,0 +1,11 @@
+suite:
+  id: "SUITE-SMOKE-WEB"
+  name: "Web Application Smoke Tests"
+  description: "Basic smoke tests for web application functionality"
+  tags: [smoke, web, regression]
+  parallel: false
+  maxWorkers: 1
+  tests:
+    - "TC-WEB-001"
+    - "TC-WEB-002"
+    - "TC-WEB-003"

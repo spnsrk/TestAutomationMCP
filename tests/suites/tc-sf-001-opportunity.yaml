@@ -1,0 +1,66 @@
+test:
+  id: "TC-SF-001"
+  name: "Salesforce Opportunity Lifecycle"
+  description: "Create Account, create Opportunity, update Stage to Closed Won, verify Amount rollup on Account"
+  type: integration
+  priority: critical
+  tags: [salesforce, opportunity, regression]
+  timeout: 120000
+  retries: 1
+
+  variables:
+    accountName: "Test Account ${timestamp}"
+    opportunityName: "Test Opportunity ${timestamp}"
+    opportunityAmount: 50000
+
+  setup:
+    - name: "Create Account"
+      action: sf/data.create
+      object: Account
+      data:
+        Name: "${accountName}"
+      save_as: createdAccount
+
+  steps:
+    - name: "Create Opportunity linked to Account"
+      action: sf/data.create
+      object: Opportunity
+      data:
+        Name: "${opportunityName}"
+        AccountId: "${createdAccount.Id}"
+        StageName: "Prospecting"
+        Amount: ${opportunityAmount}
+        CloseDate: "2025-12-31"
+      save_as: createdOpportunity
+
+    - name: "Update Opportunity Stage to Closed Won"
+      action: sf/data.update
+      object: Opportunity
+      data:
+        Id: "${createdOpportunity.Id}"
+        StageName: "Closed Won"
+
+    - name: "Query Account to verify Amount rollup"
+      action: sf/data.soqlQuery
+      query: "SELECT Id, Name, (SELECT Amount FROM Opportunities WHERE StageName = 'Closed Won') FROM Account WHERE Id = '${createdAccount.Id}'"
+      save_as: accountWithRollup
+
+    - name: "Verify Opportunity amount rolled up on Account"
+      assert:
+        - field: accountWithRollup.records[0].Opportunities.records[0].Amount
+          expected: ${opportunityAmount}
+
+  teardown:
+    - name: "Delete Opportunity"
+      action: sf/data.delete
+      object: Opportunity
+      data:
+        Id: "${createdOpportunity.Id}"
+      continueOnFailure: true
+
+    - name: "Delete Account"
+      action: sf/data.delete
+      object: Account
+      data:
+        Id: "${createdAccount.Id}"
+      continueOnFailure: true

@@ -1,0 +1,33 @@
+FROM mcr.microsoft.com/playwright:v1.50.0-noble AS base
+
+WORKDIR /app
+
+FROM base AS builder
+
+COPY package.json package-lock.json* ./
+COPY tsconfig.base.json ./
+COPY packages/core/package.json packages/core/
+COPY packages/mcp-servers/web/package.json packages/mcp-servers/web/
+
+RUN npm ci --ignore-scripts
+
+COPY packages/core/ packages/core/
+COPY packages/mcp-servers/web/ packages/mcp-servers/web/
+
+RUN npm run build --workspace=packages/core && \
+    npm run build --workspace=packages/mcp-servers/web
+
+FROM base AS production
+
+COPY --from=builder /app/package.json /app/package-lock.json* ./
+COPY --from=builder /app/tsconfig.base.json ./
+COPY --from=builder /app/packages/core/package.json packages/core/
+COPY --from=builder /app/packages/core/dist/ packages/core/dist/
+COPY --from=builder /app/packages/mcp-servers/web/package.json packages/mcp-servers/web/
+COPY --from=builder /app/packages/mcp-servers/web/dist/ packages/mcp-servers/web/dist/
+
+RUN npm ci --omit=dev --ignore-scripts
+
+ENV NODE_ENV=production
+
+ENTRYPOINT ["node", "packages/mcp-servers/web/dist/index.js"]

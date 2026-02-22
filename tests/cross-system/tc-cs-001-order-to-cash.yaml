@@ -1,0 +1,80 @@
+test:
+  id: "TC-CS-001"
+  name: "Cross-System Order-to-Cash Flow"
+  description: "Create Account + Opportunity in Salesforce, close as Won, wait for integration, verify Sales Order in SAP, verify amounts match, validate in database"
+  type: integration
+  priority: critical
+  tags: [cross-system, salesforce, sap, integration, critical]
+  timeout: 300000
+  retries: 2
+
+  variables:
+    accountName: "O2C Test Account ${timestamp}"
+    opportunityName: "O2C Opportunity ${timestamp}"
+    opportunityAmount: 75000
+
+  setup:
+    - name: "Create Account in Salesforce"
+      action: sf/data.create
+      object: Account
+      data:
+        Name: "${accountName}"
+      save_as: sfAccount
+
+    - name: "Create Opportunity in Salesforce"
+      action: sf/data.create
+      object: Opportunity
+      data:
+        Name: "${opportunityName}"
+        AccountId: "${sfAccount.Id}"
+        StageName: "Prospecting"
+        Amount: ${opportunityAmount}
+        CloseDate: "2025-12-31"
+      save_as: sfOpportunity
+
+  steps:
+    - name: "Close Opportunity as Won in Salesforce"
+      action: sf/data.update
+      object: Opportunity
+      data:
+        Id: "${sfOpportunity.Id}"
+        StageName: "Closed Won"
+
+    - name: "Verify Sales Order created in SAP via BAPI_SALESORDER_GETLIST (retries for integration delay)"
+      action: sap/rfc.callFunction
+      function: "BAPI_SALESORDER_GETLIST"
+      params:
+        SALES_ORGANIZATION: "1000"
+        SOLD_TO: "${sfAccount.AccountNumber}"
+      save_as: sapOrderList
+      retries: 12
+      timeout: 60000
+
+    - name: "Assert SAP order exists"
+      assert:
+        - field: sapOrderList.SALES_ORDERS
+          expected: "!=empty"
+
+    - name: "Get SAP order amount"
+      action: sap/rfc.callFunction
+      function: "BAPI_SALESORDER_GETDETAIL"
+      params:
+        SALESDOCUMENT: "${sapOrderList.SALES_ORDERS[0].SALES_DOCUMENT}"
+      save_as: sapOrderDetail
+
+    - name: "Verify amounts match between SF and SAP"
+      assert:
+        - field: sapOrderDetail.ORDER_HEADER_IN.TOTAL_NET_VALUE
+          expected: ${opportunityAmount}
+
+    - name: "Validate order data in database"
+      action: data/query.sql
+      query: "SELECT order_id, amount, status FROM sales_orders WHERE sf_opportunity_id = '${sfOpportunity.Id}'"
+      save_as: dbOrder
+
+    - name: "Assert database record exists and amounts match"
+      assert:
+        - field: dbOrder.rows[0].amount
+          expected: ${opportunityAmount}
+        - field: dbOrder.rows[0].status
+          expected: "CONFIRMED"

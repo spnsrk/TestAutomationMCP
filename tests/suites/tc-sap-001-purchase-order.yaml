@@ -1,0 +1,75 @@
+test:
+  id: "TC-SAP-001"
+  name: "SAP Purchase Order Creation"
+  description: "Login to Fiori, open Create Purchase Order app, fill vendor/material/quantity/delivery date, save and verify PO number, verify via RFC BAPI_PO_GETDETAIL"
+  type: e2e
+  priority: critical
+  tags: [sap, purchase-order, e2e]
+  timeout: 120000
+  retries: 1
+
+  variables:
+    vendor: "1000"
+    material: "MAT-001"
+    quantity: 10
+    deliveryDate: "2025-12-31"
+    plant: "1000"
+
+  steps:
+    - name: "Login to SAP Fiori"
+      action: sap/fiori.login
+      params:
+        username: "${sapUsername}"
+        password: "${sapPassword}"
+
+    - name: "Open Create Purchase Order app"
+      action: sap/fiori.navigate
+      params:
+        appId: "F0862A"
+        semanticObject: "ManagePurchaseOrder"
+
+    - name: "Fill vendor"
+      action: sap/fiori.fill
+      selector: "[data-sap-ui-id*='vendor']"
+      value: "${vendor}"
+
+    - name: "Fill material"
+      action: sap/fiori.fill
+      selector: "[data-sap-ui-id*='material']"
+      value: "${material}"
+
+    - name: "Fill quantity"
+      action: sap/fiori.fill
+      selector: "[data-sap-ui-id*='quantity']"
+      value: "${quantity}"
+
+    - name: "Fill delivery date"
+      action: sap/fiori.fill
+      selector: "[data-sap-ui-id*='deliveryDate']"
+      value: "${deliveryDate}"
+
+    - name: "Save Purchase Order"
+      action: sap/fiori.click
+      selector: "[data-sap-ui-id*='save']"
+      save_as: poCreationResult
+
+    - name: "Verify PO number was created from save result"
+      assert:
+        - field: poCreationResult.poNumber
+          expected: "!=empty"
+
+    - name: "Verify PO via RFC BAPI_PO_GETDETAIL"
+      action: sap/rfc.callFunction
+      function: "BAPI_PO_GETDETAIL"
+      params:
+        PO_NUMBER: "${poCreationResult.poNumber}"
+      save_as: poDetail
+
+    - name: "Verify PO details match"
+      assert:
+        - field: poDetail.PO_HEADER.VENDOR
+          expected: "${vendor}"
+        - field: poDetail.PO_ITEMS[0].MATERIAL
+          expected: "${material}"
+        - field: poDetail.PO_ITEMS[0].QUANTITY
+          expected: ${quantity}

@@ -1,0 +1,70 @@
+port: 3100
+host: localhost
+logLevel: info
+
+environments:
+  default:
+    name: default
+    description: Local development environment
+    web:
+      baseUrl: http://localhost:3000
+      browser: chromium
+      headless: true
+      viewport:
+        width: 1280
+        height: 720
+      timeout: 30000
+    api:
+      baseUrl: http://localhost:3000/api
+      authType: none
+
+  staging:
+    name: staging
+    description: Staging environment
+    web:
+      baseUrl: https://staging.example.com
+      browser: chromium
+      headless: true
+      timeout: 30000
+    salesforce:
+      loginUrl: https://test.salesforce.com
+      apiVersion: "62.0"
+      authMethod: oauth
+      credentialKey: sf-staging
+    sap:
+      fioriUrl: https://sap-staging.example.com
+      systemId: QAS
+      client: "100"
+      credentialKey: sap-staging
+
+defaultEnvironment: default
+
+mcpServers:
+  web:
+    command: node
+    args: ["../mcp-servers/web/dist/index.js"]
+  # salesforce:
+  #   command: node
+  #   args: ["../mcp-servers/salesforce/dist/index.js"]
+  # sap:
+  #   command: node
+  #   args: ["../mcp-servers/sap/dist/index.js"]
+  # api:
+  #   command: node
+  #   args: ["../mcp-servers/api/dist/index.js"]
+  # data:
+  #   command: node
+  #   args: ["../mcp-servers/data/dist/index.js"]
+
+execution:
+  maxParallelTests: 4
+  defaultTimeout: 300000
+  retryAttempts: 1
+  retryDelay: 5000
+
+reporting:
+  outputDir: ./reports
+  formats:
+    - json
+    - html
+  screenshotsOnFailure: true

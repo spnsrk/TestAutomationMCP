@@ -1,0 +1,32 @@
+{
+  "name": "@test-automation-mcp/mcp-server-sap",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "mcp-server-sap": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist .turbo *.tsbuildinfo",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@test-automation-mcp/core": "*",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "playwright": "^1.50.0",
+    "zod": "^3.24.0",
+    "axios": "^1.7.0"
+  },
+  "optionalDependencies": {
+    "node-rfc": "^3.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  }
+}

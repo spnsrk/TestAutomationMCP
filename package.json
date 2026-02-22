@@ -1,0 +1,32 @@
+{
+  "name": "test-automation-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multi-Agent MCP Platform for test automation across Full-Stack Web, Salesforce, and SAP",
+  "workspaces": [
+    "packages/*",
+    "packages/mcp-servers/*",
+    "packages/agents/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.0.0"
+}
