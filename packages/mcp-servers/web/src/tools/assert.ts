@@ -94,7 +94,7 @@ export const assertTools = {
     },
   },
 
-  "web/assertURL": {
+  "web.assertURL": {
     description: "Assert the current page URL matches an expected pattern",
     inputSchema: z.object({
       url: z.string().describe("Expected URL or regex pattern"),
@@ -112,14 +112,14 @@ export const assertTools = {
       if (matches) {
         return {
           status: "success",
-          tool: "web/assertURL",
+          tool: "web.assertURL",
           duration: 0,
           data: { expected: params.url, actual: currentUrl, passed: true },
         };
       }
       return {
         status: "failure",
-        tool: "web/assertURL",
+        tool: "web.assertURL",
         duration: 0,
         data: { expected: params.url, actual: currentUrl, passed: false },
         error: {

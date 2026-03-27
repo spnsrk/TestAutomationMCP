@@ -110,7 +110,7 @@ function getResponseSchema(
 }
 
 export const contractTools = {
-  "api/contract.validateOpenAPI": {
+  "api.contract.validateOpenAPI": {
     description: "Validate an API response against an OpenAPI specification",
     inputSchema: z.object({
       specUrl: z.string().optional().describe("URL to fetch the OpenAPI spec"),
@@ -138,7 +138,7 @@ export const contractTools = {
       if (!specSource) {
         return {
           status: "error",
-          tool: "api/contract.validateOpenAPI",
+          tool: "api.contract.validateOpenAPI",
           duration: Math.round(performance.now() - start),
           error: {
             code: "MISSING_SPEC",
@@ -153,7 +153,7 @@ export const contractTools = {
       if (!responseSchema) {
         return {
           status: "error",
-          tool: "api/contract.validateOpenAPI",
+          tool: "api.contract.validateOpenAPI",
           duration: Math.round(performance.now() - start),
           error: {
             code: "SCHEMA_NOT_FOUND",
@@ -177,7 +177,7 @@ export const contractTools = {
 
         return {
           status: valid ? "success" : "failure",
-          tool: "api/contract.validateOpenAPI",
+          tool: "api.contract.validateOpenAPI",
           duration: Math.round(performance.now() - start),
           data: {
             passed: valid,
@@ -192,7 +192,7 @@ export const contractTools = {
 
       return {
         status: "success",
-        tool: "api/contract.validateOpenAPI",
+        tool: "api.contract.validateOpenAPI",
         duration: Math.round(performance.now() - start),
         data: {
           endpoint: params.endpoint,

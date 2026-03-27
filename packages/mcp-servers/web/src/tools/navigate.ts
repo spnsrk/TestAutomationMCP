@@ -3,7 +3,7 @@ import type { Page } from "playwright";
 import type { ToolResult } from "@test-automation-mcp/core";
 
 export const navigateTools = {
-  "web/navigate": {
+  "web.navigate": {
     description: "Navigate to a URL in the browser",
     inputSchema: z.object({
       url: z.string().describe("The URL to navigate to"),
@@ -21,7 +21,7 @@ export const navigateTools = {
       });
       return {
         status: "success",
-        tool: "web/navigate",
+        tool: "web.navigate",
         duration: 0,
         data: {
           url: page.url(),

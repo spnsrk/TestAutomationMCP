@@ -16,7 +16,13 @@ async function main() {
       provider: process.env["LLM_PROVIDER"] ?? "ollama",
       model: process.env["LLM_MODEL"] ?? "llama3",
       baseUrl: process.env["LLM_BASE_URL"],
-      apiKey: process.env["LLM_API_KEY"],
+      apiKey: (
+        process.env["LLM_API_KEY"] ||
+        process.env["ANTHROPIC_API_KEY"] ||
+        process.env["OPENAI_API_KEY"] ||
+        process.env["AZURE_OPENAI_API_KEY"] ||
+        undefined
+      ),
     },
     dbPath: process.env["DB_PATH"] ?? "./data/tamcp.db",
   });

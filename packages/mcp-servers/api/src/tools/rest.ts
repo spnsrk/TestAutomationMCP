@@ -98,7 +98,7 @@ export const restTools = {
     },
   },
 
-  "api/rest.assertSchema": {
+  "api.rest.assertSchema": {
     description: "Validate an HTTP response body against a JSON Schema",
     inputSchema: z.object({
       url: z.string().describe("Request URL"),
@@ -121,7 +121,7 @@ export const restTools = {
 
       return {
         status: valid ? "success" : "failure",
-        tool: "api/rest.assertSchema",
+        tool: "api.rest.assertSchema",
         duration,
         data: {
           passed: valid,
@@ -177,7 +177,7 @@ export const restTools = {
     },
   },
 
-  "api/rest.assertResponseTime": {
+  "api.rest.assertResponseTime": {
     description: "Assert that an HTTP request completes within the specified time",
     inputSchema: z.object({
       url: z.string().describe("Request URL"),
@@ -198,7 +198,7 @@ export const restTools = {
 
       return {
         status: passed ? "success" : "failure",
-        tool: "api/rest.assertResponseTime",
+        tool: "api.rest.assertResponseTime",
         duration,
         data: {
           passed,

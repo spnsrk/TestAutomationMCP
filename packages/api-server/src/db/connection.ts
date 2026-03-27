@@ -73,6 +73,33 @@ export function getDb(dbPath = "./data/tamcp.db") {
       analysis_json TEXT,
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS qa_runs (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      source TEXT NOT NULL,
+      environment TEXT NOT NULL DEFAULT 'default',
+      status TEXT NOT NULL DEFAULT 'running',
+      report_json TEXT,
+      report_markdown TEXT,
+      error_message TEXT,
+      started_at TEXT NOT NULL,
+      completed_at TEXT,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS connector_configs (
+      type TEXT PRIMARY KEY,
+      config_json TEXT NOT NULL DEFAULT '{}',
+      status TEXT NOT NULL DEFAULT 'disconnected',
+      connected_user TEXT,
+      connected_at TEXT,
+      instance_url TEXT,
+      access_token TEXT,
+      refresh_token TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
   `);
 
   db = drizzle(sqlite, { schema });

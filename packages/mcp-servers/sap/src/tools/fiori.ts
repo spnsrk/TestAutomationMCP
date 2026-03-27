@@ -298,7 +298,7 @@ export const fioriTools = {
     },
   },
 
-  "sap/fiori.selectListItem": {
+  "sap.fiori.selectListItem": {
     description:
       "Select an item from a UI5 list (sap.m.List, sap.m.SelectList, sap.m.ComboBox, etc.).",
     inputSchema: z.object({
@@ -340,7 +340,7 @@ export const fioriTools = {
 
       return {
         status: "success",
-        tool: "sap/fiori.selectListItem",
+        tool: "sap.fiori.selectListItem",
         duration: 0,
         data: {
           itemText: params.itemText,
@@ -350,7 +350,7 @@ export const fioriTools = {
     },
   },
 
-  "sap/fiori.readTable": {
+  "sap.fiori.readTable": {
     description:
       "Read data from a UI5 sap.m.Table or sap.ui.table.Table. Returns an array of row objects with column header keys.",
     inputSchema: z.object({
@@ -461,7 +461,7 @@ export const fioriTools = {
 
       return {
         status: "success",
-        tool: "sap/fiori.readTable",
+        tool: "sap.fiori.readTable",
         duration: 0,
         data: tableData,
       };

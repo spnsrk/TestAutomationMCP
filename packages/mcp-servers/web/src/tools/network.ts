@@ -106,7 +106,7 @@ export const networkTools = {
     },
   },
 
-  "web/waitForRequest": {
+  "web.waitForRequest": {
     description: "Wait for a network request matching a URL pattern",
     inputSchema: z.object({
       urlPattern: z.string(),
@@ -123,7 +123,7 @@ export const networkTools = {
 
       return {
         status: "success",
-        tool: "web/waitForRequest",
+        tool: "web.waitForRequest",
         duration: 0,
         data: {
           url: request.url(),

@@ -62,14 +62,14 @@ export class AnthropicProvider implements LLMProvider {
     }
 
     const data = (await res.json()) as AnthropicResponse;
-    const textContent = data.content
+    const textContent = (data.content ?? [])
       .filter((c) => c.type === "text")
       .map((c) => c.text)
       .join("");
 
     return {
       content: textContent,
-      model: data.model,
+      model: data.model ?? "unknown",
       usage: data.usage
         ? {
             promptTokens: data.usage.input_tokens,

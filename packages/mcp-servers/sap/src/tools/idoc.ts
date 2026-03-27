@@ -46,7 +46,7 @@ const segmentSchema = z.object({
 });
 
 export const idocTools = {
-  "sap/idoc.send": {
+  "sap.idoc.send": {
     description:
       "Send an IDoc to the SAP system via RFC. Builds the IDoc control record and data records, " +
       "then calls IDOC_INBOUND_ASYNCHRONOUS to post it.",
@@ -77,7 +77,7 @@ export const idocTools = {
         segments: Array<{ segmentName: string; data: Record<string, string> }>;
       }
     ): Promise<ToolResult> => {
-      const check = requireRfc("sap/idoc.send");
+      const check = requireRfc("sap.idoc.send");
       if ("error" in check) return check.error;
 
       const controlRecord: Record<string, string> = {
@@ -116,7 +116,7 @@ export const idocTools = {
 
         return {
           status: "success",
-          tool: "sap/idoc.send",
+          tool: "sap.idoc.send",
           duration: 0,
           data: {
             idocNumber,
@@ -128,7 +128,7 @@ export const idocTools = {
       } catch (err) {
         return {
           status: "failure",
-          tool: "sap/idoc.send",
+          tool: "sap.idoc.send",
           duration: 0,
           error: {
             code: "IDOC_SEND_FAILED",

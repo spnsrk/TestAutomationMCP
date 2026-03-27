@@ -1,0 +1,20 @@
+FROM node:20-slim AS builder
+WORKDIR /app
+COPY package.json package-lock.json* turbo.json tsconfig.base.json ./
+COPY packages/core/package.json packages/core/
+COPY packages/mcp-servers/api/package.json packages/mcp-servers/api/
+RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts
+COPY packages/core/ packages/core/
+COPY packages/mcp-servers/api/ packages/mcp-servers/api/
+RUN npx turbo run build --filter=@test-automation-mcp/mcp-server-api
+
+FROM node:20-slim
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/core/dist ./packages/core/dist
+COPY --from=builder /app/packages/core/package.json ./packages/core/
+COPY --from=builder /app/packages/mcp-servers/api/dist ./packages/mcp-servers/api/dist
+COPY --from=builder /app/packages/mcp-servers/api/package.json ./packages/mcp-servers/api/
+COPY --from=builder /app/package.json ./
+ENV NODE_ENV=production
+ENTRYPOINT ["node", "packages/mcp-servers/api/dist/index.js"]

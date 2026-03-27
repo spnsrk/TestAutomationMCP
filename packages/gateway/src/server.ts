@@ -44,7 +44,7 @@ export class GatewayServer {
 
   private registerGatewayTools(): void {
     this.server.tool(
-      "gateway/runTest",
+      "gateway.runTest",
       "Execute a single test by ID or inline definition",
       {
         testId: z.string().optional().describe("ID of a stored test to run"),
@@ -69,7 +69,7 @@ export class GatewayServer {
     );
 
     this.server.tool(
-      "gateway/runSuite",
+      "gateway.runSuite",
       "Execute a test suite",
       {
         suiteId: z.string().describe("ID of the test suite to run"),
@@ -96,7 +96,7 @@ export class GatewayServer {
     );
 
     this.server.tool(
-      "gateway/callTool",
+      "gateway.callTool",
       "Call a tool on a specific MCP server",
       {
         tool: z.string().describe("Full tool name (e.g., web/navigate, sf/data.soqlQuery)"),
@@ -112,7 +112,7 @@ export class GatewayServer {
     );
 
     this.server.tool(
-      "gateway/listTools",
+      "gateway.listTools",
       "List all available tools across all MCP servers",
       {},
       async () => {
@@ -124,7 +124,7 @@ export class GatewayServer {
     );
 
     this.server.tool(
-      "gateway/getResults",
+      "gateway.getResults",
       "Get test execution results",
       {
         testId: z.string().optional(),
@@ -152,7 +152,7 @@ export class GatewayServer {
     );
 
     this.server.tool(
-      "gateway/getStatus",
+      "gateway.getStatus",
       "Get gateway status including connected servers and capabilities",
       {},
       async () => {

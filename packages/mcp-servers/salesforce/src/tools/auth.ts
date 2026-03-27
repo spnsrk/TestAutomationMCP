@@ -23,7 +23,7 @@ export function createAuthState(): AuthState {
 }
 
 export const authTools = {
-  "sf/auth.login": {
+  "salesforce.auth.login": {
     description:
       "Login to Salesforce using OAuth, SOAP, or JWT authentication. Returns connection info, userId, and orgId.",
     inputSchema: z.object({
@@ -102,7 +102,7 @@ export const authTools = {
           const errBody = await tokenResponse.text();
           return {
             status: "error",
-            tool: "sf/auth.login",
+            tool: "salesforce.auth.login",
             duration: 0,
             error: {
               code: "OAUTH_ERROR",
@@ -132,7 +132,7 @@ export const authTools = {
 
         return {
           status: "success",
-          tool: "sf/auth.login",
+          tool: "salesforce.auth.login",
           duration: 0,
           data: {
             userId: identity.user_id,
@@ -158,7 +158,7 @@ export const authTools = {
 
       return {
         status: "success",
-        tool: "sf/auth.login",
+        tool: "salesforce.auth.login",
         duration: 0,
         data: {
           userId: userInfo.id,

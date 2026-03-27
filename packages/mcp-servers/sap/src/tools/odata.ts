@@ -76,7 +76,7 @@ function buildQueryUrl(
 }
 
 export const odataTools = {
-  "sap/odata.query": {
+  "sap.odata.query": {
     description:
       "Query an OData entity set with optional filtering, selection, expansion, paging, and ordering.",
     inputSchema: z.object({
@@ -110,7 +110,7 @@ export const odataTools = {
       if (!context?.axiosFactory) {
         return {
           status: "error",
-          tool: "sap/odata.query",
+          tool: "sap.odata.query",
           duration: 0,
           error: {
             code: "NO_AXIOS",
@@ -135,7 +135,7 @@ export const odataTools = {
 
         return {
           status: "success",
-          tool: "sap/odata.query",
+          tool: "sap.odata.query",
           duration: 0,
           data: {
             entitySet: params.entitySet,
@@ -148,7 +148,7 @@ export const odataTools = {
         const axErr = err as { response?: { status?: number; data?: unknown }; message?: string };
         return {
           status: "failure",
-          tool: "sap/odata.query",
+          tool: "sap.odata.query",
           duration: 0,
           error: {
             code: "ODATA_QUERY_FAILED",
@@ -326,7 +326,7 @@ export const odataTools = {
     },
   },
 
-  "sap/odata.delete": {
+  "sap.odata.delete": {
     description: "Delete an entity via OData DELETE request.",
     inputSchema: z.object({
       serviceUrl: z.string().describe("Base OData service URL"),
@@ -342,7 +342,7 @@ export const odataTools = {
       if (!context?.axiosFactory) {
         return {
           status: "error",
-          tool: "sap/odata.delete",
+          tool: "sap.odata.delete",
           duration: 0,
           error: { code: "NO_AXIOS", message: "OData tools require an axios instance." },
         };
@@ -359,7 +359,7 @@ export const odataTools = {
 
         return {
           status: "success",
-          tool: "sap/odata.delete",
+          tool: "sap.odata.delete",
           duration: 0,
           data: { entityPath: params.entityPath, deleted: true },
         };
@@ -367,7 +367,7 @@ export const odataTools = {
         const axErr = err as { response?: { status?: number; data?: unknown }; message?: string };
         return {
           status: "failure",
-          tool: "sap/odata.delete",
+          tool: "sap.odata.delete",
           duration: 0,
           error: {
             code: "ODATA_DELETE_FAILED",

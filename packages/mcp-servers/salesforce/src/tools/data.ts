@@ -6,7 +6,7 @@ import { createLogger } from "@test-automation-mcp/core";
 const logger = createLogger("sf-data");
 
 export const dataTools = {
-  "sf/data.soqlQuery": {
+  "salesforce.data.soqlQuery": {
     description:
       "Execute a SOQL query against Salesforce. Supports both standard and Tooling API queries.",
     inputSchema: z.object({
@@ -42,7 +42,7 @@ export const dataTools = {
 
       return {
         status: "success",
-        tool: "sf/data.soqlQuery",
+        tool: "salesforce.data.soqlQuery",
         duration: 0,
         data: {
           totalSize: result.totalSize,
@@ -79,7 +79,7 @@ export const dataTools = {
     },
   },
 
-  "sf/data.insertRecord": {
+  "salesforce.data.insertRecord": {
     description:
       "Insert a new record into a Salesforce object. Returns the new record ID.",
     inputSchema: z.object({
@@ -97,7 +97,7 @@ export const dataTools = {
       if (!result.success) {
         return {
           status: "failure",
-          tool: "sf/data.insertRecord",
+          tool: "salesforce.data.insertRecord",
           duration: 0,
           error: {
             code: "INSERT_FAILED",
@@ -114,7 +114,7 @@ export const dataTools = {
 
       return {
         status: "success",
-        tool: "sf/data.insertRecord",
+        tool: "salesforce.data.insertRecord",
         duration: 0,
         data: {
           id: result.id,
@@ -271,7 +271,7 @@ export const dataTools = {
     },
   },
 
-  "sf/data.bulkOperation": {
+  "salesforce.data.bulkOperation": {
     description:
       "Perform a bulk data operation (insert, update, delete, or upsert) on multiple records",
     inputSchema: z.object({
@@ -336,7 +336,7 @@ export const dataTools = {
 
       return {
         status: failureCount > 0 ? "failure" : "success",
-        tool: "sf/data.bulkOperation",
+        tool: "salesforce.data.bulkOperation",
         duration: 0,
         data: {
           operation: params.operation,

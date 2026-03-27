@@ -15,18 +15,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    strategy:
-      matrix:
-        node-version: [20]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
           cache: npm
 
       - name: Install dependencies
@@ -38,35 +34,23 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
-      - name: Validate test definitions
-        run: |
-          node packages/cli/dist/index.js validate tests/
+      - name: Run unit tests — LLM providers
+        run: npm run test --workspace=packages/llm
 
-      - name: Run smoke tests
-        run: |
-          node packages/cli/dist/index.js run tests/suites/tc-web-001-login.yaml --environment default --quiet
-        continue-on-error: true
+      - name: Run unit tests — Connectors
+        run: npm run test --workspace=packages/connectors
 
-      - name: Generate test report
-        if: always()
-        run: |
-          mkdir -p reports
-          echo '{"suiteId":"ci-run","suiteName":"CI Smoke","status":"success","startTime":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","endTime":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","duration":0,"testResults":[],"summary":{"total":0,"passed":0,"failed":0,"errors":0,"skipped":0,"passRate":0}}' > reports/ci-results.json
-          node packages/cli/dist/index.js report reports/ci-results.json --format junit > reports/junit-results.xml || true
+      - name: Run unit tests — QA Agent
+        run: npm run test --workspace=packages/agents/qa-agent
+
+      - name: Run unit tests — API Server routes
+        run: npm run test --workspace=packages/api-server
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-node-${{ matrix.node-version }}
+          name: test-results
           path: |
-            reports/
-          retention-days: 30
-
-      - name: Upload JUnit results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-results-node-${{ matrix.node-version }}
-          path: reports/junit-results.xml
-          retention-days: 30
+            packages/**/test-results/
+          retention-days: 14

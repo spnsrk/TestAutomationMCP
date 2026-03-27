@@ -1,0 +1,23 @@
+FROM node:20-slim AS builder
+WORKDIR /app
+# python3 + make + g++ are needed for optional native DB drivers (pg, mongodb, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && \
+    rm -rf /var/lib/apt/lists/*
+COPY package.json package-lock.json* turbo.json tsconfig.base.json ./
+COPY packages/core/package.json packages/core/
+COPY packages/mcp-servers/data/package.json packages/mcp-servers/data/
+RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts
+COPY packages/core/ packages/core/
+COPY packages/mcp-servers/data/ packages/mcp-servers/data/
+RUN npx turbo run build --filter=@test-automation-mcp/mcp-server-data
+
+FROM node:20-slim
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/core/dist ./packages/core/dist
+COPY --from=builder /app/packages/core/package.json ./packages/core/
+COPY --from=builder /app/packages/mcp-servers/data/dist ./packages/mcp-servers/data/dist
+COPY --from=builder /app/packages/mcp-servers/data/package.json ./packages/mcp-servers/data/
+COPY --from=builder /app/package.json ./
+ENV NODE_ENV=production
+ENTRYPOINT ["node", "packages/mcp-servers/data/dist/index.js"]

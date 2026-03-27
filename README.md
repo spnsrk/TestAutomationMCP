@@ -6,6 +6,7 @@ An AI-powered, multi-agent test automation platform built on the **Model Context
 
 ## Key Features
 
+- **AI QA Engineer** -- Give it a Jira story, GitHub issue, design document, or paste requirements and an autonomous AI agent acts as a senior QA engineer: it reasons about the system, executes real tests using browser/API/DB tools, and produces a structured pass/fail report with root cause analysis. Powered by Anthropic Claude.
 - **AI-Powered Test Generation** -- Upload a requirements document (PDF, Word, Excel) and the AI extracts requirements, creates test plans, and generates executable tests automatically.
 - **Multi-System Testing** -- Unified testing across Web (Playwright), Salesforce (jsforce), SAP (Fiori/RFC/OData), REST/GraphQL APIs, and databases.
 - **Web Dashboard** -- Non-technical users can upload documents, review test plans, run tests, and view results -- all from a browser, no CLI needed.
@@ -21,15 +22,18 @@ An AI-powered, multi-agent test automation platform built on the **Model Context
 ```
 Users ──▶ Web Dashboard (Next.js) ──▶ API Server (Fastify)
                                            │
-              ┌────────────────────────────┼─────────────────────┐
-              ▼                            ▼                     ▼
-        LLM Router              Multi-Agent Pipeline         Connectors
+              ┌────────────────────────────┼──────────────────────────┐
+              ▼                            ▼                          ▼
+        LLM Router              Multi-Agent Pipeline              Connectors
     (Ollama/OpenAI/...)    Strategist → Generator → Executor → Analyzer
-                                           │
-              ┌───────────┬────────────────┼────────────┬───────────┐
-              ▼           ▼                ▼            ▼           ▼
-          Web MCP     SF MCP          SAP MCP       API MCP     Data MCP
-        (Playwright)  (jsforce)    (RFC/OData)    (axios/GQL)  (pg/mongo)
+                                                                      │
+                          AI QA Engineer (agent-qa)                   │
+                          Claude ←→ MCP Gateway ←──────────────────────┘
+                                       │
+              ┌───────────┬────────────┼────────────┬───────────┐
+              ▼           ▼            ▼            ▼           ▼
+          Web MCP     SF MCP       SAP MCP       API MCP     Data MCP
+        (Playwright)  (jsforce)  (RFC/OData)  (axios/GQL)  (pg/mongo)
 ```
 
 ---
@@ -72,7 +76,23 @@ docker compose -f docker/docker-compose.full.yaml up --build
 
 ## How to Use
 
-### For Non-Technical Users (Dashboard)
+### AI QA Engineer (Fastest Path)
+
+Set your Anthropic API key and give it something to test:
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Then from the Dashboard go to **QA Runs** → **New Run** and either:
+- Paste a requirement or user story
+- Enter a Jira issue key (e.g. `PROJ-123`)
+- Enter a GitHub issue reference (e.g. `owner/repo#42`)
+- Upload a design or solution document
+
+The AI QA Engineer will autonomously reason about the system, execute browser/API/DB tests, and return a structured report with PASS/FAIL per test case, root causes, and risk level.
+
+### For Non-Technical Users (Full Pipeline)
 
 1. Open `http://localhost:3000`
 2. Go to **Documents** and upload a PDF, Word, or Excel requirements document
@@ -105,6 +125,7 @@ TestAutomationMCP/
 ├── packages/
 │   ├── core/               # Shared types, schemas, utilities
 │   ├── agents/
+│   │   ├── qa-agent/       # AI QA Engineer (Claude agentic loop)
 │   │   ├── strategist/     # AI test plan generation
 │   │   ├── generator/      # AI test case generation
 │   │   ├── executor/       # Test execution engine
@@ -146,16 +167,19 @@ TestAutomationMCP/
 
 ## AI / LLM Configuration
 
-The platform uses AI for requirement extraction, test strategy, and failure analysis. Configure via environment variables:
+The platform uses AI for requirement extraction, test strategy, failure analysis, and the autonomous AI QA Engineer. Configure via environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `ANTHROPIC_API_KEY` | -- | **Required for AI QA Engineer.** Get from [console.anthropic.com](https://console.anthropic.com) |
 | `LLM_PROVIDER` | `ollama` | `ollama`, `openai`, `anthropic`, `azure-openai` |
 | `LLM_MODEL` | `llama3` | Model name |
 | `LLM_BASE_URL` | `http://localhost:11434` | Provider API URL |
 | `LLM_API_KEY` | -- | API key (cloud providers only) |
 
-**Free local AI:** Install [Ollama](https://ollama.ai), run `ollama pull llama3`, and the platform works out of the box.
+**Free local AI (test generation only):** Install [Ollama](https://ollama.ai), run `ollama pull llama3`, and the pipeline works out of the box.
+
+**AI QA Engineer:** Requires `ANTHROPIC_API_KEY`. The agent uses Claude's tool-use capability in an agentic loop to autonomously execute tests.
 
 ---
 

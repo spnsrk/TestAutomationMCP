@@ -42,7 +42,7 @@ function requireRfcClient(): { client: RfcClient } | { error: ToolResult } {
 }
 
 export const rfcTools = {
-  "sap/rfc.callFunction": {
+  "sap.rfc.callFunction": {
     description:
       "Call an RFC function module on the connected SAP system. Returns the export parameters and tables from the function module.",
     inputSchema: z.object({
@@ -78,7 +78,7 @@ export const rfcTools = {
         const result = await check.client.call(params.functionName, callParams);
         return {
           status: "success",
-          tool: "sap/rfc.callFunction",
+          tool: "sap.rfc.callFunction",
           duration: 0,
           data: {
             functionName: params.functionName,
@@ -88,7 +88,7 @@ export const rfcTools = {
       } catch (err) {
         return {
           status: "failure",
-          tool: "sap/rfc.callFunction",
+          tool: "sap.rfc.callFunction",
           duration: 0,
           error: {
             code: "RFC_CALL_FAILED",
@@ -100,7 +100,7 @@ export const rfcTools = {
     },
   },
 
-  "sap/rfc.callBAPI": {
+  "sap.rfc.callBAPI": {
     description:
       "Call a BAPI function with automatic BAPI_TRANSACTION_COMMIT afterwards. " +
       "Returns BAPI results including RETURN messages for error checking.",
@@ -153,7 +153,7 @@ export const rfcTools = {
 
           return {
             status: "failure",
-            tool: "sap/rfc.callBAPI",
+            tool: "sap.rfc.callBAPI",
             duration: 0,
             data: {
               bapiName: params.bapiName,
@@ -177,7 +177,7 @@ export const rfcTools = {
 
         return {
           status: "success",
-          tool: "sap/rfc.callBAPI",
+          tool: "sap.rfc.callBAPI",
           duration: 0,
           data: {
             bapiName: params.bapiName,
@@ -189,7 +189,7 @@ export const rfcTools = {
       } catch (err) {
         return {
           status: "failure",
-          tool: "sap/rfc.callBAPI",
+          tool: "sap.rfc.callBAPI",
           duration: 0,
           error: {
             code: "BAPI_CALL_FAILED",

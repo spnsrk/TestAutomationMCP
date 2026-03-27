@@ -40,6 +40,9 @@ export class GitHubConnector implements Connector {
 
   async fetchRequirements(query: ConnectorQuery): Promise<RequirementDocument[]> {
     const repo = query.project ?? "";
+    if (!repo) {
+      throw new Error("GitHub connector requires a project in the format 'owner/repo'");
+    }
     const state = query.status?.[0] ?? "open";
     const perPage = query.maxResults ?? 30;
     const labelsParam = query.labels?.join(",") ?? "";
@@ -54,7 +57,8 @@ export class GitHubConnector implements Connector {
       throw new Error(`GitHub API error (${res.status}): ${await res.text()}`);
     }
 
-    const issues = (await res.json()) as GitHubIssue[];
+    const data = await res.json();
+    const issues: GitHubIssue[] = Array.isArray(data) ? data : [];
     return issues
       .filter((i) => !("pull_request" in i))
       .map((issue) => ({
@@ -64,13 +68,37 @@ export class GitHubConnector implements Connector {
         description: issue.body ?? "",
         source: "github",
         type: "issue",
-        labels: issue.labels.map((l) => l.name),
+        labels: (issue.labels ?? []).map((l) => l.name),
         acceptanceCriteria: [],
         rawData: issue as unknown as Record<string, unknown>,
       }));
   }
 
   async fetchSingle(externalId: string): Promise<RequirementDocument | null> {
-    return null;
+    // externalId format: "owner/repo#42"
+    const match = externalId.match(/^(.+)#(\d+)$/);
+    if (!match) return null;
+    const [, repo, issueNumber] = match;
+    try {
+      const res = await fetch(
+        `${this.baseUrl}/repos/${repo}/issues/${issueNumber}`,
+        { headers: this.headers }
+      );
+      if (!res.ok) return null;
+      const issue = await res.json() as GitHubIssue;
+      return {
+        id: String(issue.id),
+        externalId: `${repo}#${issue.number}`,
+        title: issue.title,
+        description: issue.body ?? "",
+        source: "github",
+        type: "issue",
+        labels: (issue.labels ?? []).map((l) => l.name),
+        acceptanceCriteria: [],
+        rawData: issue as unknown as Record<string, unknown>,
+      };
+    } catch {
+      return null;
+    }
   }
 }

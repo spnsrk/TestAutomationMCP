@@ -55,6 +55,39 @@ export const testResults = sqliteTable("test_results", {
   createdAt: text("created_at").notNull(),
 });
 
+export const qaRuns = sqliteTable("qa_runs", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  source: text("source").notNull(),
+  environment: text("environment").notNull().default("default"),
+  status: text("status").notNull().default("running"), // running, completed, failed
+  reportJson: text("report_json"),       // JSON string of QAReport
+  reportMarkdown: text("report_markdown"),
+  errorMessage: text("error_message"),
+  startedAt: text("started_at").notNull(),
+  completedAt: text("completed_at"),
+  createdAt: text("created_at").notNull(),
+});
+
+export const connectorConfigs = sqliteTable("connector_configs", {
+  type: text("type").primaryKey(),            // salesforce | jira | github
+  configJson: text("config_json").notNull(),  // JSON: non-secret config (urls, auth type)
+  status: text("status").notNull().default("disconnected"),
+  connectedUser: text("connected_user"),
+  connectedAt: text("connected_at"),
+  instanceUrl: text("instance_url"),
+  accessToken: text("access_token"),          // stored token (OAuth)
+  refreshToken: text("refresh_token"),        // stored refresh token (OAuth)
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export type ConnectorConfigRow = typeof connectorConfigs.$inferSelect;
+export type NewConnectorConfigRow = typeof connectorConfigs.$inferInsert;
+
+export type QARun = typeof qaRuns.$inferSelect;
+export type NewQARun = typeof qaRuns.$inferInsert;
+
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
 export type TestPlan = typeof testPlans.$inferSelect;

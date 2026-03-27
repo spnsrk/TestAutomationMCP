@@ -1,6 +1,23 @@
 @description('Name prefix for all resources')
 param namePrefix string = 'tamcp'
 
+@description('Anthropic API key for AI QA agent')
+@secure()
+param anthropicApiKey string = ''
+
+@description('LLM provider (ollama, openai, anthropic, azure-openai)')
+param llmProvider string = 'anthropic'
+
+@description('LLM model name')
+param llmModel string = 'claude-sonnet-4-6'
+
+@description('LLM API key (for non-Anthropic providers)')
+@secure()
+param llmApiKey string = ''
+
+@description('LLM base URL (for self-hosted providers)')
+param llmBaseUrl string = ''
+
 @description('Azure region')
 param location string = resourceGroup().location
 
@@ -54,6 +71,11 @@ resource apiApp 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'HOST', value: '0.0.0.0' }
             { name: 'NODE_ENV', value: 'production' }
             { name: 'DB_PATH', value: '/app/data/tamcp.db' }
+            { name: 'ANTHROPIC_API_KEY', secureValue: anthropicApiKey }
+            { name: 'LLM_PROVIDER', value: llmProvider }
+            { name: 'LLM_MODEL', value: llmModel }
+            { name: 'LLM_API_KEY', secureValue: llmApiKey }
+            { name: 'LLM_BASE_URL', value: llmBaseUrl }
           ]
           volumeMounts: [
             { volumeName: 'data', mountPath: '/app/data' }

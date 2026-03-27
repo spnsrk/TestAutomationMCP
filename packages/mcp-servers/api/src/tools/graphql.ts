@@ -90,7 +90,7 @@ export const graphqlTools = {
     },
   },
 
-  "api/graphql.assertField": {
+  "api.graphql.assertField": {
     description: "Assert that a specific field in a GraphQL response matches the expected value",
     inputSchema: z.object({
       endpoint: z.string().describe("GraphQL endpoint URL"),
@@ -120,7 +120,7 @@ export const graphqlTools = {
 
       return {
         status: passed ? "success" : "failure",
-        tool: "api/graphql.assertField",
+        tool: "api.graphql.assertField",
         duration,
         data: {
           passed,

@@ -11,6 +11,17 @@ export interface McpServerConfig {
   env?: Record<string, string>;
 }
 
+export interface McpToolSchema {
+  name: string;
+  description?: string;
+  inputSchema: {
+    type: string;
+    properties?: Record<string, unknown>;
+    required?: string[];
+    additionalProperties?: boolean;
+  };
+}
+
 interface ManagedServer {
   client: Client;
   transport: StdioClientTransport;
@@ -24,6 +35,7 @@ interface ManagedServer {
 export class McpRouter {
   private servers = new Map<string, ManagedServer>();
   private toolToServer = new Map<string, string>();
+  private toolSchemas = new Map<string, McpToolSchema>();
 
   async registerServer(
     name: string,
@@ -48,8 +60,13 @@ export class McpRouter {
     const toolNames = tools.map((t) => t.name);
 
     this.servers.set(name, { client, transport, tools: toolNames });
-    for (const toolName of toolNames) {
-      this.toolToServer.set(toolName, name);
+    for (const tool of tools) {
+      this.toolToServer.set(tool.name, name);
+      this.toolSchemas.set(tool.name, {
+        name: tool.name,
+        description: tool.description,
+        inputSchema: tool.inputSchema as McpToolSchema["inputSchema"],
+      });
     }
 
     logger.info(
@@ -140,6 +157,14 @@ export class McpRouter {
       result.push({ name: toolName, server: serverName });
     }
     return result;
+  }
+
+  listToolSchemas(): McpToolSchema[] {
+    return Array.from(this.toolSchemas.values());
+  }
+
+  getToolSchema(toolName: string): McpToolSchema | undefined {
+    return this.toolSchemas.get(toolName);
   }
 
   getServerForTool(toolName: string): string | undefined {

@@ -1,6 +1,8 @@
 import type { Connector, ConnectorConfig, ConnectorQuery, RequirementDocument } from "./connector.js";
 import { JiraConnector } from "./providers/jira.js";
 import { GitHubConnector } from "./providers/github.js";
+import { SalesforceConnector } from "./providers/salesforce.js";
+import type { SalesforceCredentials, SalesforceTokens } from "./providers/salesforce.js";
 import { createLogger } from "@test-automation-mcp/core";
 
 const logger = createLogger("connector-registry");
@@ -8,11 +10,13 @@ const logger = createLogger("connector-registry");
 const CONNECTORS: Record<string, () => Connector> = {
   jira: () => new JiraConnector(),
   github: () => new GitHubConnector(),
+  salesforce: () => new SalesforceConnector({ clientId: "", clientSecret: "" }),
 };
 
 export class ConnectorRegistry {
   private instances = new Map<string, Connector>();
 
+  /** Register Jira or GitHub via standard ConnectorConfig. */
   async register(name: string, config: ConnectorConfig): Promise<Connector> {
     const factory = CONNECTORS[name];
     if (!factory) {
@@ -29,6 +33,14 @@ export class ConnectorRegistry {
 
     this.instances.set(name, connector);
     logger.info({ name, connected }, "Connector registered");
+    return connector;
+  }
+
+  /** Register Salesforce with its dedicated credentials + optional stored tokens. */
+  registerSalesforce(creds: SalesforceCredentials, tokens?: SalesforceTokens): SalesforceConnector {
+    const connector = new SalesforceConnector(creds, tokens);
+    this.instances.set("salesforce", connector);
+    logger.info({ authType: creds.authType }, "Salesforce connector registered");
     return connector;
   }
 

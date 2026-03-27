@@ -9,7 +9,8 @@
     "dev": "tsc --watch",
     "start": "node dist/index.js",
     "clean": "rm -rf dist .turbo *.tsbuildinfo",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@test-automation-mcp/core": "*",
@@ -38,6 +39,7 @@
     "@types/better-sqlite3": "^7.6.12",
     "@types/pdf-parse": "^1.1.4",
     "@types/uuid": "^10.0.0",
-    "drizzle-kit": "^0.30.0"
+    "drizzle-kit": "^0.30.0",
+    "vitest": "^2.0.0"
   }
 }

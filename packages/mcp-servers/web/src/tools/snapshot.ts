@@ -3,7 +3,7 @@ import type { Page } from "playwright";
 import type { ToolResult } from "@test-automation-mcp/core";
 
 export const snapshotTools = {
-  "web/snapshot": {
+  "web.snapshot": {
     description:
       "Get a structured accessibility snapshot of the current page (LLM-friendly representation)",
     inputSchema: z.object({
@@ -16,7 +16,7 @@ export const snapshotTools = {
       const snapshot = await page.locator(":root").ariaSnapshot();
       return {
         status: "success",
-        tool: "web/snapshot",
+        tool: "web.snapshot",
         duration: 0,
         data: {
           snapshot,
@@ -27,7 +27,7 @@ export const snapshotTools = {
     },
   },
 
-  "web/screenshot": {
+  "web.screenshot": {
     description: "Take a screenshot of the current page or a specific element",
     inputSchema: z.object({
       path: z.string().optional().describe("File path to save the screenshot"),
@@ -54,7 +54,7 @@ export const snapshotTools = {
       }
       return {
         status: "success",
-        tool: "web/screenshot",
+        tool: "web.screenshot",
         duration: 0,
         data: {
           path: params.path,
@@ -66,7 +66,7 @@ export const snapshotTools = {
     },
   },
 
-  "web/getDOM": {
+  "web.getDOM": {
     description: "Get the HTML content of the page or a specific element",
     inputSchema: z.object({
       selector: z.string().optional().describe("Selector to get HTML of a specific element"),
@@ -80,7 +80,7 @@ export const snapshotTools = {
       if (params.selector) {
         const prop = params.outer ? "outerHTML" : "innerHTML";
         html = await page.locator(params.selector).evaluate(
-          (el, p) => (p === "outerHTML" ? el.outerHTML : el.innerHTML),
+          (el, p) => (p === "outerHTML" ? (el as HTMLElement).outerHTML : (el as HTMLElement).innerHTML),
           prop
         );
       } else {
@@ -88,14 +88,14 @@ export const snapshotTools = {
       }
       return {
         status: "success",
-        tool: "web/getDOM",
+        tool: "web.getDOM",
         duration: 0,
         data: { html: html.slice(0, 50000) },
       };
     },
   },
 
-  "web/evaluate": {
+  "web.evaluate": {
     description: "Execute JavaScript in the browser context and return the result",
     inputSchema: z.object({
       expression: z.string().describe("JavaScript expression to evaluate"),
@@ -107,7 +107,7 @@ export const snapshotTools = {
       const result = await page.evaluate(params.expression);
       return {
         status: "success",
-        tool: "web/evaluate",
+        tool: "web.evaluate",
         duration: 0,
         data: { result },
       };

@@ -47,7 +47,7 @@ export class WebMcpServer {
 
   private registerTools(): void {
     this.server.tool(
-      "web/launch",
+      "web.launch",
       "Launch a new browser instance with optional configuration",
       {
         headless: z.boolean().default(true).describe("Run browser in headless mode"),
@@ -77,7 +77,7 @@ export class WebMcpServer {
     );
 
     this.server.tool(
-      "web/close",
+      "web.close",
       "Close the browser instance",
       {},
       async () => {

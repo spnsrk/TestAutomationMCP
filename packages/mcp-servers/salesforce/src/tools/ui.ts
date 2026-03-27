@@ -63,7 +63,7 @@ export const uiTools = {
     },
   },
 
-  "sf/ui.navigateToRecord": {
+  "salesforce.ui.navigateToRecord": {
     description:
       "Navigate to a specific Salesforce record page by object type and record ID",
     inputSchema: z.object({
@@ -101,7 +101,7 @@ export const uiTools = {
 
       return {
         status: "success",
-        tool: "sf/ui.navigateToRecord",
+        tool: "salesforce.ui.navigateToRecord",
         duration: 0,
         data: {
           url: page.url(),
@@ -114,7 +114,7 @@ export const uiTools = {
     },
   },
 
-  "sf/ui.fillForm": {
+  "salesforce.ui.fillForm": {
     description:
       "Fill a Salesforce Lightning form by mapping field labels to values. Handles standard Lightning input components including text, picklist, date, and lookup fields.",
     inputSchema: z.object({
@@ -198,7 +198,7 @@ export const uiTools = {
 
       return {
         status: allSucceeded ? "success" : "failure",
-        tool: "sf/ui.fillForm",
+        tool: "salesforce.ui.fillForm",
         duration: 0,
         data: {
           filledFields,

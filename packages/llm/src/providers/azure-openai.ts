@@ -64,7 +64,7 @@ export class AzureOpenAIProvider implements LLMProvider {
 
     return {
       content: data.choices[0]?.message.content ?? "",
-      model: data.model,
+      model: data.model ?? "unknown",
       usage: data.usage
         ? {
             promptTokens: data.usage.prompt_tokens,

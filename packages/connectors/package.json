@@ -8,7 +8,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf dist .turbo *.tsbuildinfo",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@test-automation-mcp/core": "*",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "typescript": "^5.7.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "vitest": "^2.0.0"
   }
 }

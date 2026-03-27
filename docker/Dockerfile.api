@@ -3,14 +3,19 @@ WORKDIR /app
 COPY package.json package-lock.json turbo.json tsconfig.base.json ./
 COPY packages/core/package.json packages/core/
 COPY packages/llm/package.json packages/llm/
+COPY packages/gateway/package.json packages/gateway/
+COPY packages/connectors/package.json packages/connectors/
 COPY packages/agents/strategist/package.json packages/agents/strategist/
 COPY packages/agents/generator/package.json packages/agents/generator/
 COPY packages/agents/executor/package.json packages/agents/executor/
 COPY packages/agents/analyzer/package.json packages/agents/analyzer/
+COPY packages/agents/qa-agent/package.json packages/agents/qa-agent/
 COPY packages/api-server/package.json packages/api-server/
 RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts
 COPY packages/core/ packages/core/
 COPY packages/llm/ packages/llm/
+COPY packages/gateway/ packages/gateway/
+COPY packages/connectors/ packages/connectors/
 COPY packages/agents/ packages/agents/
 COPY packages/api-server/ packages/api-server/
 RUN npx turbo run build --filter=@test-automation-mcp/api-server
@@ -22,6 +27,10 @@ COPY --from=builder /app/packages/core/dist ./packages/core/dist
 COPY --from=builder /app/packages/core/package.json ./packages/core/
 COPY --from=builder /app/packages/llm/dist ./packages/llm/dist
 COPY --from=builder /app/packages/llm/package.json ./packages/llm/
+COPY --from=builder /app/packages/gateway/dist ./packages/gateway/dist
+COPY --from=builder /app/packages/gateway/package.json ./packages/gateway/
+COPY --from=builder /app/packages/connectors/dist ./packages/connectors/dist
+COPY --from=builder /app/packages/connectors/package.json ./packages/connectors/
 COPY --from=builder /app/packages/agents ./packages/agents
 COPY --from=builder /app/packages/api-server/dist ./packages/api-server/dist
 COPY --from=builder /app/packages/api-server/package.json ./packages/api-server/

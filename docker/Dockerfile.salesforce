@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/playwright:v1.50.0-noble AS builder
+WORKDIR /app
+COPY package.json package-lock.json* turbo.json tsconfig.base.json ./
+COPY packages/core/package.json packages/core/
+COPY packages/mcp-servers/salesforce/package.json packages/mcp-servers/salesforce/
+RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts
+COPY packages/core/ packages/core/
+COPY packages/mcp-servers/salesforce/ packages/mcp-servers/salesforce/
+RUN npx turbo run build --filter=@test-automation-mcp/mcp-server-salesforce
+
+FROM mcr.microsoft.com/playwright:v1.50.0-noble
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/core/dist ./packages/core/dist
+COPY --from=builder /app/packages/core/package.json ./packages/core/
+COPY --from=builder /app/packages/mcp-servers/salesforce/dist ./packages/mcp-servers/salesforce/dist
+COPY --from=builder /app/packages/mcp-servers/salesforce/package.json ./packages/mcp-servers/salesforce/
+COPY --from=builder /app/package.json ./
+ENV NODE_ENV=production
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENTRYPOINT ["node", "packages/mcp-servers/salesforce/dist/index.js"]

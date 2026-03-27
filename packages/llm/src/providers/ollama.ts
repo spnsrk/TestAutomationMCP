@@ -59,8 +59,8 @@ export class OllamaProvider implements LLMProvider {
     const data = (await res.json()) as OllamaChatResponse;
 
     return {
-      content: data.message.content,
-      model: data.model,
+      content: data.message?.content ?? "",
+      model: data.model ?? "unknown",
       usage: {
         promptTokens: data.prompt_eval_count ?? 0,
         completionTokens: data.eval_count ?? 0,

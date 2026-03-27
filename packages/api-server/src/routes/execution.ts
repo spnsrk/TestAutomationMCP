@@ -5,6 +5,7 @@ import { getDb } from "../db/connection.js";
 import { testPlans, testDefinitions, testRuns, testResults } from "../db/schema.js";
 import { ExecutorAgent } from "@test-automation-mcp/agent-executor";
 import { AnalyzerAgent } from "@test-automation-mcp/agent-analyzer";
+import type { GatewayServer } from "@test-automation-mcp/gateway";
 import type { TestDefinition, ToolResult } from "@test-automation-mcp/core";
 import { createLogger } from "@test-automation-mcp/core";
 
@@ -24,9 +25,18 @@ function createSimulatedToolCaller() {
   };
 }
 
+function createGatewayToolCaller(gateway: GatewayServer) {
+  return {
+    async callTool(toolName: string, params: Record<string, unknown>): Promise<ToolResult> {
+      return gateway.getRouter().callTool(toolName, params);
+    },
+  };
+}
+
 export function registerExecutionRoutes(
   app: FastifyInstance,
-  wsClients: Map<string, Set<(msg: string) => void>>
+  wsClients: Map<string, Set<(msg: string) => void>>,
+  gateway: GatewayServer | null
 ): void {
   app.post("/api/tests/run", async (request, reply) => {
     const body = request.body as {
@@ -82,12 +92,19 @@ export function registerExecutionRoutes(
     };
 
     broadcast({ type: "run_started", runId, testCount: definitions.length });
-
     reply.status(202).send({ runId, status: "running", testCount: definitions.length });
 
     setImmediate(async () => {
       try {
-        const executor = new ExecutorAgent(createSimulatedToolCaller());
+        const toolCaller = gateway
+          ? createGatewayToolCaller(gateway)
+          : createSimulatedToolCaller();
+
+        if (!gateway) {
+          logger.warn({ runId }, "No gateway available — running in simulation mode");
+        }
+
+        const executor = new ExecutorAgent(toolCaller);
         const execResponse = await executor.execute({
           tests: definitions,
           environment,
@@ -132,6 +149,7 @@ export function registerExecutionRoutes(
           analysis: analysis.summary,
           recommendations: analysis.recommendations,
           failures: analysis.failures,
+          simulated: !gateway,
         };
 
         db.update(testRuns)
@@ -159,35 +177,4 @@ export function registerExecutionRoutes(
     });
   });
 
-  app.get("/api/tests/runs", async (_request, reply) => {
-    const db = getDb();
-    const rows = db.select().from(testRuns).all();
-    return reply.send({
-      runs: rows.map((r) => ({
-        ...r,
-        resultsSummaryJson: r.resultsSummaryJson ? JSON.parse(r.resultsSummaryJson) : null,
-      })),
-    });
-  });
-
-  app.get("/api/tests/runs/:id", async (request, reply) => {
-    const { id } = request.params as { id: string };
-    const db = getDb();
-    const run = db.select().from(testRuns).where(eq(testRuns.id, id)).get();
-    if (!run) {
-      return reply.status(404).send({ error: "Run not found" });
-    }
-
-    const results = db.select().from(testResults).where(eq(testResults.runId, id)).all();
-
-    return reply.send({
-      ...run,
-      resultsSummaryJson: run.resultsSummaryJson ? JSON.parse(run.resultsSummaryJson) : null,
-      results: results.map((r) => ({
-        ...r,
-        resultJson: JSON.parse(r.resultJson),
-        analysisJson: r.analysisJson ? JSON.parse(r.analysisJson) : null,
-      })),
-    });
-  });
 }

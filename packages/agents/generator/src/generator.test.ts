@@ -76,7 +76,7 @@ describe("GeneratorAgent", () => {
         ...(definition.test.teardown ?? []).map((s) => s.action),
       ];
 
-      const hasWebActions = allActions.some((a) => a.startsWith("web/"));
+      const hasWebActions = allActions.some((a) => a.startsWith("web.") || a.startsWith("web/"));
       expect(hasWebActions).toBe(true);
     });
 

@@ -3,7 +3,7 @@ import type { Page } from "playwright";
 import type { ToolResult } from "@test-automation-mcp/core";
 
 export const interactTools = {
-  "web/click": {
+  "web.click": {
     description: "Click an element on the page",
     inputSchema: z.object({
       selector: z.string().describe("CSS selector, text content, or role-based selector"),
@@ -22,14 +22,14 @@ export const interactTools = {
       });
       return {
         status: "success",
-        tool: "web/click",
+        tool: "web.click",
         duration: 0,
         data: { selector: params.selector },
       };
     },
   },
 
-  "web/fill": {
+  "web.fill": {
     description: "Fill an input field with text (clears existing value first)",
     inputSchema: z.object({
       selector: z.string().describe("Selector for the input element"),
@@ -45,14 +45,14 @@ export const interactTools = {
       });
       return {
         status: "success",
-        tool: "web/fill",
+        tool: "web.fill",
         duration: 0,
         data: { selector: params.selector, value: params.value },
       };
     },
   },
 
-  "web/type": {
+  "web.type": {
     description: "Type text character by character (appends to existing value)",
     inputSchema: z.object({
       selector: z.string(),
@@ -68,14 +68,14 @@ export const interactTools = {
       });
       return {
         status: "success",
-        tool: "web/type",
+        tool: "web.type",
         duration: 0,
         data: { selector: params.selector, text: params.text },
       };
     },
   },
 
-  "web/select": {
+  "web.select": {
     description: "Select an option from a dropdown",
     inputSchema: z.object({
       selector: z.string(),
@@ -97,21 +97,21 @@ export const interactTools = {
       } else {
         return {
           status: "error",
-          tool: "web/select",
+          tool: "web.select",
           duration: 0,
           error: { code: "INVALID_PARAMS", message: "Provide value, label, or index" },
         };
       }
       return {
         status: "success",
-        tool: "web/select",
+        tool: "web.select",
         duration: 0,
         data: { selector: params.selector, selected },
       };
     },
   },
 
-  "web/hover": {
+  "web.hover": {
     description: "Hover over an element",
     inputSchema: z.object({
       selector: z.string(),
@@ -124,14 +124,14 @@ export const interactTools = {
       await page.hover(params.selector, { timeout: params.timeout ?? 30000 });
       return {
         status: "success",
-        tool: "web/hover",
+        tool: "web.hover",
         duration: 0,
         data: { selector: params.selector },
       };
     },
   },
 
-  "web/pressKey": {
+  "web.pressKey": {
     description: "Press a keyboard key or key combination",
     inputSchema: z.object({
       key: z.string().describe("Key to press (e.g., 'Enter', 'Tab', 'Control+A')"),
@@ -143,14 +143,14 @@ export const interactTools = {
       await page.keyboard.press(params.key);
       return {
         status: "success",
-        tool: "web/pressKey",
+        tool: "web.pressKey",
         duration: 0,
         data: { key: params.key },
       };
     },
   },
 
-  "web/upload": {
+  "web.upload": {
     description: "Upload a file to a file input element",
     inputSchema: z.object({
       selector: z.string(),
@@ -163,7 +163,7 @@ export const interactTools = {
       await page.setInputFiles(params.selector, params.filePath);
       return {
         status: "success",
-        tool: "web/upload",
+        tool: "web.upload",
         duration: 0,
         data: { selector: params.selector, filePath: params.filePath },
       };

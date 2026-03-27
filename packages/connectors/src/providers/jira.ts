@@ -32,19 +32,27 @@ export class JiraConnector implements Connector {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
 
     if (config.auth.type === "basic") {
+      if (!config.auth.username || !config.auth.password) {
+        throw new Error("Jira basic auth requires username and password");
+      }
       const credentials = Buffer.from(`${config.auth.username}:${config.auth.password}`).toString("base64");
       this.headers = {
         Authorization: `Basic ${credentials}`,
         "Content-Type": "application/json",
       };
     } else if (config.auth.type === "token") {
+      if (!config.auth.token) {
+        throw new Error("Jira token auth requires a token");
+      }
       this.headers = {
         Authorization: `Bearer ${config.auth.token}`,
         "Content-Type": "application/json",
       };
+    } else {
+      throw new Error(`Unsupported auth type: ${config.auth.type}`);
     }
 
-    logger.info({ baseUrl: this.baseUrl }, "Jira connector authenticated");
+    logger.info("Jira connector authenticated");
   }
 
   async testConnection(): Promise<boolean> {
@@ -76,9 +84,10 @@ export class JiraConnector implements Connector {
     }
 
     const data = (await res.json()) as JiraSearchResult;
-    logger.info({ total: data.total, fetched: data.issues.length }, "Jira issues fetched");
+    const issues = data.issues ?? [];
+    logger.info({ total: data.total, fetched: issues.length }, "Jira issues fetched");
 
-    return data.issues.map((issue) => this.mapIssueToRequirement(issue));
+    return issues.map((issue) => this.mapIssueToRequirement(issue));
   }
 
   async fetchSingle(externalId: string): Promise<RequirementDocument | null> {

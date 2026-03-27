@@ -89,7 +89,7 @@ export const performanceTools = {
     },
   },
 
-  "web/perf.stopTrace": {
+  "web.perf.stopTrace": {
     description: "Stop trace recording and save to file",
     inputSchema: z.object({
       outputPath: z.string().describe("Path to save the trace file (e.g. trace.zip)"),
@@ -102,14 +102,14 @@ export const performanceTools = {
       await context.tracing.stop({ path: params.outputPath });
       return {
         status: "success",
-        tool: "web/perf.stopTrace",
+        tool: "web.perf.stopTrace",
         duration: 0,
         data: { traceFilePath: params.outputPath },
       };
     },
   },
 
-  "web/perf.getMetrics": {
+  "web.perf.getMetrics": {
     description: "Get Core Web Vitals and performance metrics from the page",
     inputSchema: z.object({}),
     handler: async (page: Page): Promise<ToolResult> => {
@@ -117,7 +117,7 @@ export const performanceTools = {
       if (!raw) {
         return {
           status: "error",
-          tool: "web/perf.getMetrics",
+          tool: "web.perf.getMetrics",
           duration: 0,
           error: { code: "NO_NAVIGATION", message: "No navigation timing data available" },
         };
@@ -137,7 +137,7 @@ export const performanceTools = {
       };
       return {
         status: "success",
-        tool: "web/perf.getMetrics",
+        tool: "web.perf.getMetrics",
         duration: 0,
         data: metrics,
       };

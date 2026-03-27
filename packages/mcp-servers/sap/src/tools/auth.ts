@@ -69,7 +69,7 @@ async function waitForUI5Ready(page: Page, timeout = 30000): Promise<void> {
 }
 
 export const authTools = {
-  "sap/auth.loginFiori": {
+  "sap.auth.loginFiori": {
     description:
       "Login to SAP Fiori Launchpad via Playwright. Navigates to the Fiori URL, enters credentials, and waits for the Launchpad to be ready.",
     inputSchema: z.object({
@@ -118,7 +118,7 @@ export const authTools = {
         if (errorMsg) {
           return {
             status: "failure",
-            tool: "sap/auth.loginFiori",
+            tool: "sap.auth.loginFiori",
             duration: 0,
             error: {
               code: "FIORI_LOGIN_FAILED",
@@ -133,7 +133,7 @@ export const authTools = {
 
       return {
         status: "success",
-        tool: "sap/auth.loginFiori",
+        tool: "sap.auth.loginFiori",
         duration: 0,
         data: {
           url: page.url(),

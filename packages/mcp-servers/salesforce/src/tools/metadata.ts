@@ -84,7 +84,7 @@ export const metadataTools = {
     },
   },
 
-  "sf/metadata.getFieldSet": {
+  "salesforce.metadata.getFieldSet": {
     description:
       "Get the details of a field set on a Salesforce object, including its member fields",
     inputSchema: z.object({
@@ -121,7 +121,7 @@ export const metadataTools = {
       if (!fieldSet || !fieldSet.fullName) {
         return {
           status: "failure",
-          tool: "sf/metadata.getFieldSet",
+          tool: "salesforce.metadata.getFieldSet",
           duration: 0,
           error: {
             code: "FIELD_SET_NOT_FOUND",
@@ -137,7 +137,7 @@ export const metadataTools = {
 
       return {
         status: "success",
-        tool: "sf/metadata.getFieldSet",
+        tool: "salesforce.metadata.getFieldSet",
         duration: 0,
         data: {
           fullName: fieldSet.fullName,

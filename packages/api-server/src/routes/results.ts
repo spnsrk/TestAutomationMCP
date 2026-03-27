@@ -3,10 +3,16 @@ import { eq, desc } from "drizzle-orm";
 import { getDb } from "../db/connection.js";
 import { testRuns, testResults } from "../db/schema.js";
 
+function safeJsonParse(str: string | null | undefined): unknown {
+  if (!str) return null;
+  try { return JSON.parse(str); } catch { return null; }
+}
+
 export function registerResultsRoutes(app: FastifyInstance): void {
-  app.get("/api/results", async (request, reply) => {
+  app.get("/api/runs", async (request, reply) => {
     const query = request.query as { limit?: string; status?: string };
-    const limit = parseInt(query.limit ?? "20", 10);
+    const parsed = parseInt(query.limit ?? "20", 10);
+    const limit = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 100) : 20;
     const db = getDb();
 
     let rows = db.select().from(testRuns).orderBy(desc(testRuns.createdAt)).all();
@@ -20,12 +26,12 @@ export function registerResultsRoutes(app: FastifyInstance): void {
     return reply.send({
       results: rows.map((r) => ({
         ...r,
-        resultsSummaryJson: r.resultsSummaryJson ? JSON.parse(r.resultsSummaryJson) : null,
+        resultsSummaryJson: safeJsonParse(r.resultsSummaryJson),
       })),
     });
   });
 
-  app.get("/api/results/:runId", async (request, reply) => {
+  app.get("/api/runs/:runId", async (request, reply) => {
     const { runId } = request.params as { runId: string };
     const db = getDb();
 
@@ -39,7 +45,7 @@ export function registerResultsRoutes(app: FastifyInstance): void {
     return reply.send({
       run: {
         ...run,
-        resultsSummaryJson: run.resultsSummaryJson ? JSON.parse(run.resultsSummaryJson) : null,
+        resultsSummaryJson: safeJsonParse(run.resultsSummaryJson),
       },
       results: results.map((r) => ({
         id: r.id,
@@ -47,8 +53,8 @@ export function registerResultsRoutes(app: FastifyInstance): void {
         testName: r.testName,
         status: r.status,
         duration: r.duration,
-        result: JSON.parse(r.resultJson),
-        analysis: r.analysisJson ? JSON.parse(r.analysisJson) : null,
+        result: safeJsonParse(r.resultJson),
+        analysis: safeJsonParse(r.analysisJson),
         createdAt: r.createdAt,
       })),
     });

@@ -1,0 +1,24 @@
+FROM mcr.microsoft.com/playwright:v1.50.0-noble AS builder
+WORKDIR /app
+COPY package.json package-lock.json* turbo.json tsconfig.base.json ./
+COPY packages/core/package.json packages/core/
+COPY packages/mcp-servers/sap/package.json packages/mcp-servers/sap/
+# node-rfc (optional SAP RFC SDK binding) requires native build tools
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && \
+    rm -rf /var/lib/apt/lists/*
+RUN npm ci --ignore-scripts 2>/dev/null || npm install --ignore-scripts
+COPY packages/core/ packages/core/
+COPY packages/mcp-servers/sap/ packages/mcp-servers/sap/
+RUN npx turbo run build --filter=@test-automation-mcp/mcp-server-sap
+
+FROM mcr.microsoft.com/playwright:v1.50.0-noble
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/packages/core/dist ./packages/core/dist
+COPY --from=builder /app/packages/core/package.json ./packages/core/
+COPY --from=builder /app/packages/mcp-servers/sap/dist ./packages/mcp-servers/sap/dist
+COPY --from=builder /app/packages/mcp-servers/sap/package.json ./packages/mcp-servers/sap/
+COPY --from=builder /app/package.json ./
+ENV NODE_ENV=production
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENTRYPOINT ["node", "packages/mcp-servers/sap/dist/index.js"]

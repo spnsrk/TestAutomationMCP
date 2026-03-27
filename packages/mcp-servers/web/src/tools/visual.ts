@@ -37,7 +37,7 @@ export const visualTools = {
     },
   },
 
-  "web/compareScreenshot": {
+  "web.compareScreenshot": {
     description: "Compare current page against a baseline screenshot",
     inputSchema: z.object({
       name: z.string().describe("Baseline name to compare against"),
@@ -62,7 +62,7 @@ export const visualTools = {
       if (!existsSync(baselinePath)) {
         return {
           status: "error",
-          tool: "web/compareScreenshot",
+          tool: "web.compareScreenshot",
           duration: 0,
           error: {
             code: "BASELINE_NOT_FOUND",
@@ -88,7 +88,7 @@ export const visualTools = {
         if (baseline.width !== current.width || baseline.height !== current.height) {
           return {
             status: "failure",
-            tool: "web/compareScreenshot",
+            tool: "web.compareScreenshot",
             duration: 0,
             data: {
               name: params.name,
@@ -123,7 +123,7 @@ export const visualTools = {
 
         return {
           status: passed ? "success" : "failure",
-          tool: "web/compareScreenshot",
+          tool: "web.compareScreenshot",
           duration: 0,
           data: {
             name: params.name,
@@ -136,7 +136,7 @@ export const visualTools = {
       } catch (err) {
         return {
           status: "error",
-          tool: "web/compareScreenshot",
+          tool: "web.compareScreenshot",
           duration: 0,
           error: {
             code: "COMPARISON_ERROR",

@@ -97,7 +97,7 @@ End If
 }
 
 export const guiTools = {
-  "sap/gui.openTransaction": {
+  "sap.gui.openTransaction": {
     description:
       "Open a SAP transaction code in SAP GUI. Requires Windows with SAP GUI Scripting enabled.",
     inputSchema: z.object({
@@ -108,7 +108,7 @@ export const guiTools = {
       _page: Page,
       params: { tcode: string; timeout?: number }
     ): Promise<ToolResult> => {
-      if (!isWindows()) return { ...PLATFORM_ERROR, tool: "sap/gui.openTransaction" };
+      if (!isWindows()) return { ...PLATFORM_ERROR, tool: "sap.gui.openTransaction" };
 
       const script = `
 session.findById("wnd[0]/tbar[0]/okcd").text = "/n${params.tcode}"
@@ -120,7 +120,7 @@ WScript.Echo session.findById("wnd[0]").text
       if (!result.success) {
         return {
           status: "failure",
-          tool: "sap/gui.openTransaction",
+          tool: "sap.gui.openTransaction",
           duration: 0,
           error: {
             code: "GUI_TRANSACTION_FAILED",
@@ -131,7 +131,7 @@ WScript.Echo session.findById("wnd[0]").text
 
       return {
         status: "success",
-        tool: "sap/gui.openTransaction",
+        tool: "sap.gui.openTransaction",
         duration: 0,
         data: {
           tcode: params.tcode,

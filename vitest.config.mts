@@ -17,10 +17,15 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@test-automation-mcp/core": resolve(
-        __dirname,
-        "packages/core/src/index.ts"
-      ),
+      "@test-automation-mcp/core": resolve(__dirname, "packages/core/src/index.ts"),
+      "@test-automation-mcp/gateway": resolve(__dirname, "packages/gateway/src/index.ts"),
+      "@test-automation-mcp/connectors": resolve(__dirname, "packages/connectors/src/index.ts"),
+      "@test-automation-mcp/llm": resolve(__dirname, "packages/llm/src/index.ts"),
+      "@test-automation-mcp/agent-qa": resolve(__dirname, "packages/agents/qa-agent/src/index.ts"),
+      "@test-automation-mcp/agent-strategist": resolve(__dirname, "packages/agents/strategist/src/index.ts"),
+      "@test-automation-mcp/agent-generator": resolve(__dirname, "packages/agents/generator/src/index.ts"),
+      "@test-automation-mcp/agent-executor": resolve(__dirname, "packages/agents/executor/src/index.ts"),
+      "@test-automation-mcp/agent-analyzer": resolve(__dirname, "packages/agents/analyzer/src/index.ts"),
     },
   },
 });

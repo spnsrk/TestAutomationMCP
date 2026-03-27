@@ -8,10 +8,12 @@
   "references": [
     { "path": "../core" },
     { "path": "../llm" },
+    { "path": "../gateway" },
     { "path": "../agents/strategist" },
     { "path": "../agents/generator" },
     { "path": "../agents/executor" },
     { "path": "../agents/analyzer" },
+    { "path": "../agents/qa-agent" },
     { "path": "../connectors" }
   ]
 }
